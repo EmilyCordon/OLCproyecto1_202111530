@@ -1,0 +1,70 @@
+package proyecto1.compi;
+
+import java_cup.runtime.Symbol;
+
+parser code 
+{:
+    private Symbol s;
+
+    public void syntax_error(Symbol s) {
+        this.s = s;
+        System.err.println("Error de sintaxis en: " + s.value + " en la línea: " + s.left + " columna: " + s.right);
+    }
+
+    public Symbol getS() {
+        return this.s;
+    }
+:};
+
+terminal Reservada, DosPuntos, Flecha, Notacion, PuntoYComa, Coma, LlaveAbrir, 
+LlaveCerrar, ParentesisAbrir, ParentesisCerrar, Union, Interseccion, 
+Complemento, Diferencia, Simbolo, ID;
+
+non terminal inicio, declaracionOperaciones, declaracion, operacion, conjDef, elementoLista, elemento, conjOper, idLista, op, operLista, evaluar;
+
+precedence left LlaveAbrir, LlaveCerrar;
+
+start with inicio;
+
+inicio ::= LlaveAbrir declaracionOperaciones LlaveCerrar
+         | PuntoYComa;
+
+declaracionOperaciones ::= declaracionOperaciones declaracion
+                            | declaracionOperaciones operacion
+                            | declaracionOperaciones evaluar
+                            | declaracion
+                            | operacion
+                            | evaluar
+                            |  PuntoYComa;
+
+declaracion ::= Reservada DosPuntos ID Flecha conjDef PuntoYComa;
+
+conjDef ::= elementoLista;
+
+elementoLista ::= elemento
+                 | elementoLista Coma elemento
+                 | elementoLista Notacion elemento
+                 | PuntoYComa;
+
+elemento ::= Simbolo;
+
+operacion ::= Reservada DosPuntos ID Flecha conjOper PuntoYComa;
+
+conjOper ::= operLista idLista;
+
+operLista ::= op 
+             | operLista op
+             | operLista idLista
+             | PuntoYComa;
+
+idLista ::= idLista  LlaveAbrir ID LlaveCerrar
+           | LlaveAbrir ID LlaveCerrar
+           | op LlaveAbrir ID LlaveCerrar
+           | idLista LlaveAbrir idLista LlaveCerrar;
+
+op ::= Union
+       | Interseccion
+       | Complemento
+       | Diferencia;
+
+evaluar ::= Reservada ParentesisAbrir LlaveAbrir elementoLista LlaveCerrar Coma ID ParentesisCerrar PuntoYComa;
